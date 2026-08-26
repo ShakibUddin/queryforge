@@ -1,0 +1,45 @@
+import type { QueryResult } from "../database/query";
+
+type ResultsTableProps = {
+  result: QueryResult;
+};
+
+function ResultsTable({ result }: ResultsTableProps) {
+  return (
+    <div className="results-container">
+      <div className="results-header">
+        <h2>Results</h2>
+
+        <span>
+          {result.values.length} {result.values.length === 1 ? "row" : "rows"}
+        </span>
+      </div>
+
+      <div className="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              {result.columns.map((column) => (
+                <th key={column}>{column}</th>
+              ))}
+            </tr>
+          </thead>
+
+          <tbody>
+            {result.values.map((row, rowIndex) => (
+              <tr key={rowIndex}>
+                {row.map((value, columnIndex) => (
+                  <td key={columnIndex}>
+                    {value === null ? "NULL" : String(value)}
+                  </td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
+
+export default ResultsTable;

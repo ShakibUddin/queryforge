@@ -1,12 +1,18 @@
 import { useEffect, useState } from "react";
 import { initDatabase } from "./database/database";
 import { executeQuery, type QueryResult } from "./database/query";
+import SqlEditor from "./components/SqlEditor";
+import ResultsTable from "./components/ResultsTable";
+
+type QueryStatus = "idle" | "success" | "error";
 
 function App() {
   const [sql, setSql] = useState("SELECT * FROM users;");
   const [result, setResult] = useState<QueryResult | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [executionTime, setExecutionTime] = useState<number | null>(null);
+  const [queryStatus, setQueryStatus] = useState<QueryStatus>("idle");
 
   useEffect(() => {
     async function setup() {
@@ -33,10 +39,19 @@ function App() {
     try {
       setError(null);
 
+      const startTime = performance.now();
+
       const queryResult = executeQuery(sql);
 
+      const endTime = performance.now();
+
+      setExecutionTime(endTime - startTime);
       setResult(queryResult);
+      setQueryStatus("success");
     } catch (err) {
+      setQueryStatus("error");
+      setResult(null);
+
       setError(err instanceof Error ? err.message : "Something went wrong");
     }
   }
@@ -49,40 +64,22 @@ function App() {
     <div>
       <h1>QueryForge</h1>
 
-      <textarea
-        value={sql}
-        onChange={(event) => setSql(event.target.value)}
-        rows={8}
-        cols={80}
-      />
+      <SqlEditor value={sql} onChange={setSql} />
 
       <br />
 
       <button onClick={handleRunQuery}>Run</button>
-
-      {error && <p style={{ color: "red" }}>{error}</p>}
-
-      {result && (
-        <table>
-          <thead>
-            <tr>
-              {result.columns.map((column) => (
-                <th key={column}>{column}</th>
-              ))}
-            </tr>
-          </thead>
-
-          <tbody>
-            {result.values.map((row, rowIndex) => (
-              <tr key={rowIndex}>
-                {row.map((value, columnIndex) => (
-                  <td key={columnIndex}>{String(value)}</td>
-                ))}
-              </tr>
-            ))}
-          </tbody>
-        </table>
+      {executionTime !== null && (
+        <p>Query executed in {executionTime.toFixed(2)} ms</p>
       )}
+      {queryStatus === "error" && error && (
+        <div className="query-error">
+          <strong>Query failed</strong>
+          <p>{error}</p>
+        </div>
+      )}
+
+      {result && <ResultsTable result={result} />}
     </div>
   );
 }
