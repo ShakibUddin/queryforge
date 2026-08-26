@@ -3,7 +3,10 @@ import { initDatabase } from "./database/database";
 import { executeQuery, type QueryResult } from "./database/query";
 import SqlEditor from "./components/SqlEditor";
 import ResultsTable from "./components/ResultsTable";
-
+import CsvImporter from "./components/CsvImporter";
+import { inferSchema } from "./database/schema";
+import { createTable, insertRows } from "./database/table";
+import { getTableName } from "./database/tableName";
 type QueryStatus = "idle" | "success" | "error";
 
 function App() {
@@ -55,6 +58,26 @@ function App() {
       setError(err instanceof Error ? err.message : "Something went wrong");
     }
   }
+  function handleCsvImport(data: Record<string, string>[], fileName: string) {
+    try {
+      setError(null);
+
+      const tableName = getTableName(fileName);
+      const schema = inferSchema(data);
+
+      createTable(tableName, schema);
+
+      insertRows(tableName, schema, data);
+
+      console.log("Table:", tableName);
+      console.log("Imported rows:", data);
+      console.log("Schema:", schema);
+
+      setSql(`SELECT * FROM "${tableName}";`);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to import CSV");
+    }
+  }
 
   if (isLoading) {
     return <div>Loading database...</div>;
@@ -63,7 +86,7 @@ function App() {
   return (
     <div>
       <h1>QueryForge</h1>
-
+      <CsvImporter onImport={handleCsvImport} />
       <SqlEditor value={sql} onChange={setSql} />
 
       <br />
