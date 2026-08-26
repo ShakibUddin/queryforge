@@ -1,75 +1,46 @@
-# React + TypeScript + Vite
+# ⚡ QueryForge
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+### A real SQL engine running entirely in your browser.
 
-Currently, two official plugins are available:
+QueryForge is a browser-based SQL playground powered by **SQLite + WebAssembly**.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+Import CSV or JSON datasets, automatically infer their schema, load them into a real SQLite database running inside the browser, and execute genuine SQL — including joins, aggregations, subqueries, and more.
 
-## React Compiler
+**No backend. No database server. No data leaving your browser.**
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+---
 
-## Expanding the ESLint configuration
+## ✨ Why QueryForge?
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+Most browser-based data tools either:
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+- send your data to a backend
+- use a custom JavaScript query implementation
+- provide only basic filtering
+- require a database server
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+QueryForge takes a different approach.
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-
-```
-
-You can also install [eslint-plugin-react-x](https://npmx.dev/package/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://npmx.dev/package/eslint-plugin-react-dom) for React-specific lint rules:
-
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-
-```
+```text
+                 Your Browser
+                      │
+                      ▼
+              ┌───────────────┐
+              │    QueryForge │
+              └───────┬───────┘
+                      │
+                      ▼
+             ┌─────────────────┐
+             │ SQLite / WASM   │
+             └────────┬────────┘
+                      │
+          ┌───────────┼───────────┐
+          ▼           ▼           ▼
+       users      employees    products
+          │           │           │
+          └───────────┼───────────┘
+                      ▼
+                  SQL Query
+                      │
+                      ▼
+                 Result Table
