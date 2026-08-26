@@ -5,6 +5,21 @@ type ResultsTableProps = {
 };
 
 function ResultsTable({ result }: ResultsTableProps) {
+  if (result.values.length === 0) {
+    return (
+      <div className="results-container">
+        <div className="results-header">
+          <h2>Results</h2>
+          <span>0 rows</span>
+        </div>
+
+        <div className="empty-results">
+          Query executed successfully, but returned no rows.
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="results-container">
       <div className="results-header">
@@ -16,7 +31,7 @@ function ResultsTable({ result }: ResultsTableProps) {
       </div>
 
       <div className="table-wrapper">
-        <table>
+        <table className="results-table">
           <thead>
             <tr>
               {result.columns.map((column) => (
@@ -30,7 +45,11 @@ function ResultsTable({ result }: ResultsTableProps) {
               <tr key={rowIndex}>
                 {row.map((value, columnIndex) => (
                   <td key={columnIndex}>
-                    {value === null ? "NULL" : String(value)}
+                    {value === null ? (
+                      <span className="null-value">NULL</span>
+                    ) : (
+                      String(value)
+                    )}
                   </td>
                 ))}
               </tr>

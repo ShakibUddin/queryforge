@@ -1,5 +1,12 @@
 import { getDatabase } from "./database";
 import type { ColumnSchema } from "./schema";
+export type TableInfo = {
+    name: string;
+    columns: {
+        name: string;
+        type: string;
+    }[];
+};
 
 export function createTable(
     tableName: string,
@@ -78,4 +85,44 @@ function convertValue(
         default:
             return value;
     }
+}
+
+
+export function getTables(): TableInfo[] {
+    const db = getDatabase();
+
+    const tablesResult = db.exec(`
+      SELECT name
+      FROM sqlite_master
+      WHERE type = 'table'
+        AND name NOT LIKE 'sqlite_%'
+      ORDER BY name;
+    `);
+
+    if (tablesResult.length === 0) {
+        return [];
+    }
+
+    const tableNames = tablesResult[0].values.map(
+        (row) => String(row[0])
+    );
+
+    return tableNames.map((tableName) => {
+        const columnsResult = db.exec(
+            `PRAGMA table_info("${tableName}");`
+        );
+
+        const columns =
+            columnsResult.length > 0
+                ? columnsResult[0].values.map((row) => ({
+                    name: String(row[1]),
+                    type: String(row[2]),
+                }))
+                : [];
+
+        return {
+            name: tableName,
+            columns,
+        };
+    });
 }

@@ -1,3 +1,4 @@
+import { Upload } from "lucide-react";
 import Papa from "papaparse";
 
 type CsvImporterProps = {
@@ -27,16 +28,11 @@ function CsvImporter({ onImport }: CsvImporterProps) {
   }
 
   return (
-    <div>
-      <label htmlFor="csv-file">Import CSV</label>
-
-      <input
-        id="csv-file"
-        type="file"
-        accept=".csv"
-        onChange={handleFileChange}
-      />
-    </div>
+    <label className="import-button">
+      <Upload size={15} />
+      Import CSV
+      <input type="file" accept=".csv" onChange={handleFileChange} hidden />
+    </label>
   );
 }
 
